@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from 'react';
-import { Restaurant } from './MapComponent';
+import { Place } from './MapComponent';
 
 interface InfoPanelProps {
-  restaurant: Restaurant | null;
+  restaurant: Place | null;
   onClose: () => void;
 }
 

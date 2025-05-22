@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow, OverlayView } from '@react-google-maps/api';
 
 const containerStyle = {
   width: '100%',
@@ -32,6 +32,7 @@ interface MapComponentProps {
 
 const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [map, setMap] = useState<any>(null);
   
   // places prop이 변경될 때마다 로그 출력
   useEffect(() => {
@@ -40,16 +41,34 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
     console.log('MapComponent - first place:', places[0]);
   }, [places]);
 
+  // places가 바뀔 때마다 지도 중심 이동
+  useEffect(() => {
+    if (map && places.length > 0) {
+      const bounds = new window.google.maps.LatLngBounds();
+      places.forEach((place) => {
+        bounds.extend(place.position);
+      });
+      map.fitBounds(bounds);
+      // 장소가 1개면 적당히 확대
+      if (places.length === 1) {
+        map.setCenter(places[0].position);
+        map.setZoom(15);
+      }
+    }
+  }, [map, places]);
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
   });
 
   const onLoad = useCallback(function callback(map: any) {
+    setMap(map);
     console.log('Map loaded');
   }, []);
 
   const onUnmount = useCallback(function callback(map: any) {
+    setMap(null);
     console.log('Map unmounted');
   }, []);
 
@@ -106,14 +125,39 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
       }}
     >
       {places.map((place) => (
-        <Marker
-          key={place.id}
-          position={place.position}
-          onClick={() => handleMarkerClick(place)}
-          options={{
-            icon: getMarkerIcon(place.type)
-          }}
-        />
+        <div key={place.id}>
+          <OverlayView
+            position={place.position}
+            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '-30px',
+                transform: 'translate(-50%, -100%)',
+                whiteSpace: 'nowrap',
+                background: 'rgba(255,255,255,0.9)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontSize: '13px',
+                fontWeight: 500,
+                color: '#333',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                pointerEvents: 'none',
+              }}
+            >
+              {place.name.length > 7 ? place.name.substring(0, 7) + '...' : place.name}
+            </div>
+          </OverlayView>
+          <Marker
+            position={place.position}
+            onClick={() => handleMarkerClick(place)}
+            options={{
+              icon: getMarkerIcon(place.type)
+            }}
+          />
+        </div>
       ))}
 
       {selectedPlace && (
