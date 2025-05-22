@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 const containerStyle = {
@@ -8,70 +8,81 @@ const containerStyle = {
   height: '100%'
 };
 
+// 서울 중심 좌표로 변경
 const center = {
-  lat: 59.4371, 
-  lng: 24.7453  // 에스토니아 탈린의 대략적인 좌표
+  lat: 37.5665,
+  lng: 126.9780
 };
 
-export interface Restaurant {
-  id: number;
+export interface Place {
+  id: string;
   name: string;
   position: {
     lat: number;
     lng: number;
   };
   type: string;
-  color: string;
+  address?: string;
 }
-
-const restaurants: Restaurant[] = [
-  { id: 1, name: 'Liveliku', position: { lat: 59.436, lng: 24.728 }, type: 'restaurant', color: 'green' },
-  { id: 2, name: 'Valhalla', position: { lat: 59.437, lng: 24.743 }, type: 'cafe', color: 'orange' },
-  { id: 3, name: 'Nomad', position: { lat: 59.438, lng: 24.750 }, type: 'restaurant', color: 'red' },
-  { id: 4, name: 'Kästik', position: { lat: 59.442, lng: 24.762 }, type: 'bistro', color: 'green' },
-  { id: 5, name: 'Oriental', position: { lat: 59.429, lng: 24.735 }, type: 'restaurant', color: 'red' }
-];
 
 interface MapComponentProps {
-  onSelectRestaurant?: (restaurant: Restaurant) => void;
+  places?: Place[];
+  onSelectPlace?: (place: Place) => void;
 }
 
-const MapComponent = ({ onSelectRestaurant }: MapComponentProps) => {
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   
+  // places prop이 변경될 때마다 로그 출력
+  useEffect(() => {
+    console.log('MapComponent - places array:', places);
+    console.log('MapComponent - places length:', places.length);
+    console.log('MapComponent - first place:', places[0]);
+  }, [places]);
+
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
   });
 
   const onLoad = useCallback(function callback(map: any) {
-    // 필요한 경우 map 인스턴스를 저장할 수 있습니다
     console.log('Map loaded');
   }, []);
 
   const onUnmount = useCallback(function callback(map: any) {
-    // 필요한 경우 map 인스턴스를 해제할 수 있습니다
     console.log('Map unmounted');
   }, []);
 
-  const customMarkerIcon = (color: string) => {
-    return {
-      path: 'M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z',
-      fillColor: color,
-      fillOpacity: 1,
-      strokeWeight: 1,
-      strokeColor: '#ffffff',
-      scale: 1.5,
-      anchor: { x: 12, y: 22 },
-    };
+  /**
+   * 장소 유형에 따른 마커 아이콘 스타일 설정
+   * @param type 장소 유형 (음식점, 관광지, 기타)
+   * @returns 마커 아이콘 설정
+   */
+  const getMarkerIcon = (type: string) => {
+    // 음식 관련 장소 (레스토랑, 카페, 바 등)
+    if (type.includes('restaurant') || type.includes('cafe') || type.includes('food')) {
+      return {
+        url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'  // 빨간색
+      };
+    }
+    // 관광지 (명소, 박물관, 공원 등)
+    else if (type.includes('tourist') || type.includes('attraction') || type.includes('museum')) {
+      return {
+        url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'  // 초록색
+      };
+    }
+    // 기타 장소
+    else {
+      return {
+        url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'  // 파란색
+      };
+    }
   };
 
-  const handleMarkerClick = (restaurant: Restaurant) => {
-    setSelectedRestaurant(restaurant);
-    
-    // InfoPanel 표시를 위해 상위 컴포넌트에 선택된 레스토랑 정보 전달
-    if (onSelectRestaurant) {
-      onSelectRestaurant(restaurant);
+  const handleMarkerClick = (place: Place) => {
+    setSelectedPlace(place);
+    if (onSelectPlace) {
+      onSelectPlace(place);
     }
   };
 
@@ -94,27 +105,28 @@ const MapComponent = ({ onSelectRestaurant }: MapComponentProps) => {
         zoomControl: true,
       }}
     >
-      {restaurants.map((restaurant) => (
+      {places.map((place) => (
         <Marker
-          key={restaurant.id}
-          position={restaurant.position}
-          onClick={() => handleMarkerClick(restaurant)}
+          key={place.id}
+          position={place.position}
+          onClick={() => handleMarkerClick(place)}
           options={{
-            icon: {
-              url: `http://maps.google.com/mapfiles/ms/icons/${restaurant.color}-dot.png`,
-            }
+            icon: getMarkerIcon(place.type)
           }}
         />
       ))}
 
-      {selectedRestaurant && (
+      {selectedPlace && (
         <InfoWindow
-          position={selectedRestaurant.position}
-          onCloseClick={() => setSelectedRestaurant(null)}
+          position={selectedPlace.position}
+          onCloseClick={() => setSelectedPlace(null)}
         >
           <div className="p-2">
-            <h3 className="font-bold">{selectedRestaurant.name}</h3>
-            <p className="text-sm text-gray-600">{selectedRestaurant.type}</p>
+            <h3 className="font-bold">{selectedPlace.name}</h3>
+            <p className="text-sm text-gray-600">{selectedPlace.type}</p>
+            {selectedPlace.address && (
+              <p className="text-sm text-gray-500 mt-1">{selectedPlace.address}</p>
+            )}
           </div>
         </InfoWindow>
       )}

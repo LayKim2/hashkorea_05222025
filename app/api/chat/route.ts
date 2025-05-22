@@ -28,6 +28,7 @@ export async function POST(request: Request) {
   "searchTerms": ["카페", "레스토랑"],  // 장소 유형
   "location": "홍대",        // 지역
   "requirements": ["조용한", "24시간"], // 특별 요구사항
+  "address": "서울특별시 마포구 서교동 363-17", // 정확한 주소 (가능한 경우)
   "message": "홍대 근처의 조용한 카페를 찾아보겠습니다." // 사용자에게 보여줄 메시지
 }
 
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
   "searchTerms": ["카페"],
   "location": "홍대",
   "requirements": ["조용한"],
+  "address": "서울특별시 마포구 서교동 363-17",
   "message": "홍대 근처의 조용한 카페를 찾아보겠습니다."
 }
 
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
   "searchTerms": ["식당", "레스토랑"],
   "location": "강남역",
   "requirements": ["24시간"],
+  "address": "서울특별시 강남구 강남대로 123",
   "message": "강남역 근처의 24시간 영업하는 식당을 찾아보겠습니다."
 }
 
@@ -95,6 +98,7 @@ export async function POST(request: Request) {
           searchTerms: Array.isArray(parsedContent.searchTerms) ? parsedContent.searchTerms : [parsedContent.searchTerms],
           location: parsedContent.location,
           requirements: Array.isArray(parsedContent.requirements) ? parsedContent.requirements : [],
+          address: parsedContent.address || '',
           message: parsedContent.message || '장소를 찾아보겠습니다.'
         };
 

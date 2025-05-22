@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 import ChatInterface from './ChatInterface';
+import { Place } from './MapComponent';
 
-const ChatbotButton = () => {
+interface ChatbotButtonProps {
+  onPlacesFound: (places: Place[]) => void;
+}
+
+const ChatbotButton = ({ onPlacesFound }: ChatbotButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-  };
-
-  const handlePlacesFound = (places: google.maps.places.PlaceResult[]) => {
-    // 여기서 찾은 장소들을 처리할 수 있습니다
-    console.log('Found places:', places);
   };
 
   return (
@@ -43,7 +43,7 @@ const ChatbotButton = () => {
       {isOpen && (
         <ChatInterface 
           onClose={() => setIsOpen(false)} 
-          onPlacesFound={handlePlacesFound}
+          onPlacesFound={onPlacesFound}
         />
       )}
     </>

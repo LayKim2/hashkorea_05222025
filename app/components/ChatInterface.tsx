@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import { Place } from './MapComponent';
 
 interface Message {
   id: string;
@@ -11,7 +12,7 @@ interface Message {
 
 interface ChatInterfaceProps {
   onClose: () => void;
-  onPlacesFound: (places: google.maps.places.PlaceResult[]) => void;
+  onPlacesFound: (places: Place[]) => void;
 }
 
 interface ProcessedQuery {
@@ -20,6 +21,7 @@ interface ProcessedQuery {
   searchTerms?: string[];
   location?: string;
   requirements?: string[];
+  address?: string;
 }
 
 const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
@@ -37,21 +39,54 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
   useEffect(() => {
-    // Places 서비스 초기화
+    // Places 서비스와 Geocoder 초기화
     const mapDiv = document.createElement('div');
     const map = new google.maps.Map(mapDiv, {
       center: { lat: 37.5665, lng: 126.9780 },
       zoom: 15,
     });
     placesServiceRef.current = new google.maps.places.PlacesService(map);
+    geocoderRef.current = new google.maps.Geocoder();  // Geocoder 초기화
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  /**
+   * 주소를 좌표(latitude, longitude)로 변환하는 함수
+   * @param address 변환할 주소
+   * @returns 좌표 정보 (위도, 경도) 또는 null
+   */
+  const geocodeAddress = async (address: string): Promise<google.maps.LatLngLiteral | null> => {
+    return new Promise((resolve, reject) => {
+      if (!geocoderRef.current) {
+        reject(new Error('Geocoder not initialized'));
+        return;
+      }
+
+      geocoderRef.current.geocode({ address }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+          const location = results[0].geometry.location;
+          resolve({
+            lat: location.lat(),
+            lng: location.lng()
+          });
+        } else {
+          reject(new Error(`Geocoding failed: ${status}`));
+        }
+      });
+    });
+  };
+
+  /**
+   * Google Places API를 사용하여 장소 검색
+   * @param query 검색어, 위치, 요구사항을 포함한 검색 조건
+   * @returns 검색된 장소 목록
+   */
   const searchGooglePlaces = async (query: {
     searchTerms: string[];
     location: string;
@@ -80,6 +115,10 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
     });
   };
 
+  /**
+   * 사용자 메시지 제출 처리 및 AI 응답 생성
+   * @param e 폼 제출 이벤트
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -146,12 +185,48 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
           location: response.location,
           requirements: response.requirements || []
         });
+
+        // 주소가 있는 경우 좌표로 변환
+        if (response.address) {
+          try {
+            const coordinates = await geocodeAddress(response.address);
+            if (coordinates) {
+              // 좌표 정보를 places 배열의 첫 번째 항목에 추가
+              if (places.length > 0) {
+                places[0].geometry = {
+                  location: new google.maps.LatLng(coordinates.lat, coordinates.lng)
+                };
+              }
+            }
+          } catch (error) {
+            console.error('Geocoding error:', error);
+          }
+        }
         
-        onPlacesFound(places);
+        // Google Places 검색 결과를 MapComponent 형식으로 변환
+        const convertedPlaces = places.map((place, index) => {
+          const lat = place.geometry?.location?.lat();
+          const lng = place.geometry?.location?.lng();
+          console.log(`Place ${index} coordinates:`, { lat, lng }); // 좌표 확인용 로그
+
+          return {
+            id: place.place_id || `place-${index}`,
+            name: place.name || '',
+            position: {
+              lat: lat || 0,
+              lng: lng || 0
+            },
+            type: place.types?.[0] || 'unknown',
+            address: place.formatted_address
+          };
+        });
+
+        console.log('Converted places:', convertedPlaces);
+        onPlacesFound(convertedPlaces);
 
         // 검색 결과 메시지 추가
         const placesDescription = places.map((place, index) => 
-          `${index + 1}. ${place.name} (${place.formatted_address || '주소 없음'})`
+          `${index + 1}. ${place.name} (${place.formatted_address || response.address || '주소 없음'})`
         ).join('\n');
 
         const resultMessage: Message = {

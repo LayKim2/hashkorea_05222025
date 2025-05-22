@@ -2,16 +2,17 @@
 
 import { useState } from 'react';
 import Header from './components/Header';
-import MapComponent, { Restaurant } from './components/MapComponent';
+import MapComponent, { Place } from './components/MapComponent';
 import InfoPanel from './components/InfoPanel';
 import ChatbotButton from './components/ChatbotButton';
 
 export default function Home() {
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const [places, setPlaces] = useState<Place[]>([]);
 
-  const handleRestaurantSelect = (restaurant: Restaurant) => {
-    setSelectedRestaurant(restaurant);
+  const handlePlaceSelect = (place: Place) => {
+    setSelectedPlace(place);
     setShowInfoPanel(true);
   };
 
@@ -19,22 +20,30 @@ export default function Home() {
     setShowInfoPanel(false);
   };
 
+  const handlePlacesFound = (newPlaces: Place[]) => {
+    console.log('Home - Received places:', newPlaces);
+    setPlaces(newPlaces);
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <Header />
       <div className="flex flex-1 overflow-hidden relative">
         <div className="w-full h-full">
-          <MapComponent onSelectRestaurant={handleRestaurantSelect} />
+          <MapComponent 
+            places={places}
+            onSelectPlace={handlePlaceSelect} 
+          />
         </div>
-        {showInfoPanel && selectedRestaurant && (
+        {showInfoPanel && selectedPlace && (
           <div className="absolute top-0 right-0 h-full w-80 max-w-xs z-10">
             <InfoPanel 
-              restaurant={selectedRestaurant} 
+              restaurant={selectedPlace} 
               onClose={handleCloseInfoPanel} 
             />
           </div>
         )}
-        <ChatbotButton />
+        <ChatbotButton onPlacesFound={handlePlacesFound} />
       </div>
     </div>
   );
