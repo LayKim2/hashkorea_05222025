@@ -78,22 +78,27 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
    * @returns 마커 아이콘 설정
    */
   const getMarkerIcon = (type: string) => {
-    // 음식 관련 장소 (레스토랑, 카페, 바 등)
     if (type.includes('restaurant') || type.includes('cafe') || type.includes('food')) {
       return {
-        url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'  // 빨간색
+        url: 'icons/fastfood.png', 
+        scaledSize: new window.google.maps.Size(32, 32),
+        anchor: new window.google.maps.Point(16, 32)
       };
     }
     // 관광지 (명소, 박물관, 공원 등)
     else if (type.includes('tourist') || type.includes('attraction') || type.includes('museum')) {
       return {
-        url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'  // 초록색
+        url: '/icons/landmark.png',
+        scaledSize: new window.google.maps.Size(32, 32),
+        anchor: new window.google.maps.Point(16, 32)
       };
     }
-    // 기타 장소
+    // 기타 장소 (쇼핑몰, 편의시설 등)
     else {
       return {
-        url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'  // 파란색
+        url: '/icons/other.png',
+        scaledSize: new window.google.maps.Size(32, 32),
+        anchor: new window.google.maps.Point(16, 32)
       };
     }
   };
