@@ -5,11 +5,13 @@ import Header from './components/Header';
 import MapComponent, { Place } from './components/MapComponent';
 import InfoPanel from './components/InfoPanel';
 import ChatbotButton from './components/ChatbotButton';
+import WelcomePopup from './components/WelcomePopup';
 
 export default function Home() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(true);
 
   const handlePlaceSelect = (place: Place) => {
     setSelectedPlace(place);
@@ -44,6 +46,12 @@ export default function Home() {
           </div>
         )}
         <ChatbotButton onPlacesFound={handlePlacesFound} />
+        {showWelcomePopup && (
+          <WelcomePopup 
+            onClose={() => setShowWelcomePopup(false)}
+            onPlacesFound={handlePlacesFound}
+          />
+        )}
       </div>
     </div>
   );

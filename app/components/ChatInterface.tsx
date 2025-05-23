@@ -2,13 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Place } from './MapComponent';
-
-interface Message {
-  id: string;
-  type: 'user' | 'ai';
-  text: string;
-  timestamp: Date;
-}
+import { useChatStore, Message } from '../store/chatStore';
 
 interface ChatInterfaceProps {
   onClose: () => void;
@@ -25,21 +19,20 @@ interface ProcessedQuery {
 }
 
 const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'ai',
-      text: 'Hello! I am Hash Korea AI Assistant. What kind of place are you looking for?',
-      timestamp: new Date(),
-    },
-  ]);
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const { messages, addMessage, initializeStore } = useChatStore();
+
+  useEffect(() => {
+    setIsClient(true);
+    initializeStore();
+  }, [initializeStore]);
 
   useEffect(() => {
     // Places 서비스와 Geocoder 초기화
@@ -124,13 +117,12 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
     if (!input.trim()) return;
 
     setIsLoading(true);
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
-      type: 'user',
+      type: 'user' as const,
       text: input,
-      timestamp: new Date(),
     };
-    setMessages(prev => [...prev, userMessage]);
+    addMessage(userMessage);
     setInput('');
 
     try {
@@ -157,13 +149,12 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
       // 응답 타입에 따른 처리
       if (response.type === 'chat') {
         // 일반 대화 응답
-        const aiMessage: Message = {
+        const aiMessage = {
           id: (Date.now() + 1).toString(),
-          type: 'ai',
+          type: 'ai' as const,
           text: response.message,
-          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, aiMessage]);
+        addMessage(aiMessage);
       } else if (response.type === 'recommendation') {
         // 장소 검색 응답
         if (!response.searchTerms || !response.location) {
@@ -171,13 +162,12 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
         }
 
         // 먼저 AI의 응답 메시지 표시
-        const aiMessage: Message = {
+        const aiMessage = {
           id: (Date.now() + 1).toString(),
-          type: 'ai',
+          type: 'ai' as const,
           text: response.message,
-          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, aiMessage]);
+        addMessage(aiMessage);
 
         // Google Places 검색
         const places = await searchGooglePlaces({
@@ -229,23 +219,21 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
           `${index + 1}. ${place.name} (${place.formatted_address || response.address || '주소 없음'})`
         ).join('\n');
 
-        const resultMessage: Message = {
+        const resultMessage = {
           id: (Date.now() + 2).toString(),
-          type: 'ai',
+          type: 'ai' as const,
           text: `검색 결과입니다:\n\n${placesDescription}\n\n더 자세한 정보가 필요하신가요?`,
-          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, resultMessage]);
+        addMessage(resultMessage);
       }
     } catch (error) {
       console.error('Error:', error);
-      const errorMessage: Message = {
+      const errorMessage = {
         id: (Date.now() + 1).toString(),
-        type: 'ai',
+        type: 'ai' as const,
         text: `죄송합니다. 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`,
-        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      addMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -293,9 +281,11 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
               }`}
             >
               <p className="text-sm whitespace-pre-line">{message.text}</p>
-              <span className="text-xs opacity-70 block mt-1">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
+              {isClient && (
+                <span className="text-xs opacity-70 block mt-1">
+                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
             </div>
           </div>
         ))}
