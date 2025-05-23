@@ -17,6 +17,11 @@ interface ProcessedQuery {
   location?: string;
   requirements?: string[];
   address?: string;
+  collectedInfo?: {
+    location: string | null;
+    purpose: string | null;
+    preferences: string[] | null;
+  };
 }
 
 const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
@@ -24,7 +29,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const { messages, addMessage, initializeStore } = useChatStore();
+  const { messages, addMessage, initializeStore, collectedInfo, updateCollectedInfo } = useChatStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,7 +71,8 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
           messages: [{
             role: 'user',
             content: inputText
-          }]
+          }],
+          collectedInfo // 현재까지 수집된 정보 전송
         })
       });
 
@@ -76,6 +82,11 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
 
       const response: ProcessedQuery = await chatResponse.json();
       console.log('API response:', response);
+
+      // 응답에서 받은 collectedInfo 업데이트
+      if (response.collectedInfo) {
+        updateCollectedInfo(response.collectedInfo);
+      }
 
       // 응답 타입에 따른 처리
       if (response.type === 'chat') {
@@ -114,7 +125,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
         placesService.textSearch(request, (results, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             // Google Places 검색 결과를 MapComponent 형식으로 변환
-            const convertedPlaces = results.slice(0, 10).map((place, index) => ({
+            const convertedPlaces = results.slice(0, 5).map((place, index) => ({
               id: place.place_id || `place-${index}`,
               name: place.name || '',
               position: {
@@ -130,7 +141,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
 
             // 검색 결과 메시지 추가
             const placesDescription = results
-              .slice(0, 10)
+              .slice(0, 5)
               .map((place, index) => 
                 `${index + 1}. ${place.name} (${place.formatted_address || response.address || 'No address available'})`
               )

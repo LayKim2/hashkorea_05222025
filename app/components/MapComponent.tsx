@@ -33,6 +33,8 @@ interface MapComponentProps {
 const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [map, setMap] = useState<any>(null);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   
   // places prop이 변경될 때마다 로그 출력
   useEffect(() => {
@@ -56,6 +58,25 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
       }
     }
   }, [map, places]);
+
+  // 현재 위치 가져오기
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+          setLocationError(null);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setLocationError("위치 정보를 가져올 수 없습니다.");
+        }
+      );
+    } else {
+      setLocationError("이 브라우저는 위치 정보를 지원하지 않습니다.");
+    }
+  }, []);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -113,7 +134,7 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
   return isLoaded ? (
     <GoogleMap
       mapContainerStyle={containerStyle}
-      center={center}
+      center={userLocation || center}
       zoom={14}
       onLoad={onLoad}
       onUnmount={onUnmount}
@@ -129,6 +150,32 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
         zoomControl: true,
       }}
     >
+      {/* 현재 위치 마커 */}
+      {userLocation && (
+        <>
+          <Marker
+            position={userLocation}
+            icon={{
+              path: window.google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: "#4285F4",
+              fillOpacity: 0.8,
+              strokeColor: "#ffffff",
+              strokeWeight: 3,
+            }}
+          />
+          <OverlayView
+            position={userLocation}
+            mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+          >
+            <div className="relative">
+              <div className="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 rounded-full animate-ping opacity-75"></div>
+              <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 rounded-full"></div>
+            </div>
+          </OverlayView>
+        </>
+      )}
+
       {places.map((place) => (
         <div key={place.id}>
           <OverlayView

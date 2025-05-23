@@ -20,48 +20,84 @@ export async function POST(request: Request) {
     // Gemini 모델 초기화
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
+    // 현재까지 수집된 정보
+    const currentCollectedInfo = body.collectedInfo || {
+      location: null,
+      purpose: null,
+      preferences: null
+    };
+
     // 시스템 프롬프트와 사용자 메시지 결합
-    const prompt = `당신은 여행지 추천 AI 도우미입니다. 사용자와 자연스러운 대화를 하면서, 장소 추천이 필요한 경우 다음 JSON 형식으로 반환하세요:
+    const prompt = `You are a travel recommendation AI assistant. Detect the user's language and respond in the same language. Keep track of the information you have collected and what is still needed. When responding, include the current state of information in your response. Current collected information: ${JSON.stringify(currentCollectedInfo)}
 
 {
-  "type": "recommendation",  // 응답 타입 (recommendation 또는 chat)
-  "searchTerms": ["카페", "레스토랑"],  // 장소 유형
-  "location": "홍대",        // 지역
-  "requirements": ["조용한", "24시간"], // 특별 요구사항
-  "address": "서울특별시 마포구 서교동 363-17", // 정확한 주소 (가능한 경우)
-  "message": "홍대 근처의 조용한 카페를 찾아보겠습니다." // 사용자에게 보여줄 메시지
+  "type": "chat" | "recommendation",  // response type
+  "collectedInfo": {
+    "location": string | null,        // area (e.g., "Seoul", "Hongdae")
+    "purpose": string | null,         // purpose (e.g., "tourist spot", "restaurant")
+    "preferences": string[] | null    // specific preferences (e.g., ["quiet", "historical"])
+  },
+  "missingInfo": string[],           // list of missing information
+  "message": string,                 // message to show to the user
+  "searchTerms": string[] | null,    // place types (only for recommendation type)
+  "requirements": string[] | null    // special requirements (only for recommendation type)
 }
 
-예시 1:
-입력: "홍대 근처 조용한 카페 추천해줘"
-출력: {
-  "type": "recommendation",
-  "searchTerms": ["카페"],
-  "location": "홍대",
-  "requirements": ["조용한"],
-  "address": "서울특별시 마포구 서교동 363-17",
-  "message": "홍대 근처의 조용한 카페를 찾아보겠습니다."
-}
-
-예시 2:
-입력: "안녕하세요"
-출력: {
+Examples in English:
+Input: "I want to visit Seoul"
+Output: {
   "type": "chat",
-  "message": "안녕하세요! 어떤 여행지를 찾아보시나요?"
+  "collectedInfo": {
+    "location": "Seoul",
+    "purpose": null,
+    "preferences": null
+  },
+  "missingInfo": ["purpose", "preferences"],
+  "message": "I see you want to visit Seoul! What kind of places are you interested in? For example, tourist spots, restaurants, or shopping areas?"
 }
 
-예시 3:
-입력: "강남역 24시간 식당 찾아줘"
-출력: {
+Input: "I want to see historical sites"
+Output: {
   "type": "recommendation",
-  "searchTerms": ["식당", "레스토랑"],
-  "location": "강남역",
-  "requirements": ["24시간"],
-  "address": "서울특별시 강남구 강남대로 123",
-  "message": "강남역 근처의 24시간 영업하는 식당을 찾아보겠습니다."
+  "collectedInfo": {
+    "location": "Seoul",
+    "purpose": "historical sites",
+    "preferences": ["historical"]
+  },
+  "missingInfo": [],
+  "message": "I'll help you find historical sites in Seoul.",
+  "searchTerms": ["historical site", "tourist attraction"],
+  "requirements": ["historical"]
 }
 
-사용자 입력: ${body.messages[body.messages.length - 1].content}`;
+Examples in Korean:
+Input: "서울 가고 싶어"
+Output: {
+  "type": "chat",
+  "collectedInfo": {
+    "location": "서울",
+    "purpose": null,
+    "preferences": null
+  },
+  "missingInfo": ["purpose", "preferences"],
+  "message": "서울을 방문하고 싶으시군요! 어떤 종류의 장소를 찾고 계신가요? 예를 들어, 관광지, 맛집, 쇼핑 장소 등이 있습니다."
+}
+
+Input: "역사적인 장소를 보고 싶어"
+Output: {
+  "type": "recommendation",
+  "collectedInfo": {
+    "location": "서울",
+    "purpose": "역사적 장소",
+    "preferences": ["역사적"]
+  },
+  "missingInfo": [],
+  "message": "서울의 역사적인 장소를 찾아보겠습니다.",
+  "searchTerms": ["역사적 장소", "관광지"],
+  "requirements": ["역사적"]
+}
+
+User input: ${body.messages[body.messages.length - 1].content}`;
 
     // 메시지 전송 및 응답 받기
     const result = await model.generateContent(prompt);
@@ -79,27 +115,30 @@ export async function POST(request: Request) {
       if (parsedContent.type === 'chat') {
         return NextResponse.json({
           type: 'chat',
-          message: parsedContent.message
+          message: parsedContent.message,
+          collectedInfo: parsedContent.collectedInfo
         });
       }
 
       // recommendation 타입인 경우 데이터 검증
       if (parsedContent.type === 'recommendation') {
-        if (!parsedContent.searchTerms || !parsedContent.location) {
-          return NextResponse.json(
-            { error: 'Invalid response format from Gemini' },
-            { status: 500 }
-          );
+        // 모든 필요한 정보가 수집되었는지 확인
+        if (parsedContent.missingInfo && parsedContent.missingInfo.length > 0) {
+          return NextResponse.json({
+            type: 'chat',
+            message: parsedContent.message,
+            collectedInfo: parsedContent.collectedInfo
+          });
         }
 
         // 기본값 설정
         const response = {
           type: 'recommendation',
           searchTerms: Array.isArray(parsedContent.searchTerms) ? parsedContent.searchTerms : [parsedContent.searchTerms],
-          location: parsedContent.location,
+          location: parsedContent.collectedInfo.location,
           requirements: Array.isArray(parsedContent.requirements) ? parsedContent.requirements : [],
-          address: parsedContent.address || '',
-          message: parsedContent.message || '장소를 찾아보겠습니다.'
+          message: parsedContent.message || 'I will search for places for you.',
+          collectedInfo: parsedContent.collectedInfo
         };
 
         console.log('Final response:', response);

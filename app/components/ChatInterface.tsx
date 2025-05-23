@@ -16,6 +16,7 @@ interface ProcessedQuery {
   location?: string;
   requirements?: string[];
   address?: string;
+  collectedInfo?: any;
 }
 
 const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
@@ -27,7 +28,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
-  const { messages, addMessage, initializeStore } = useChatStore();
+  const { messages, addMessage, initializeStore, collectedInfo, updateCollectedInfo } = useChatStore();
 
   useEffect(() => {
     setIsClient(true);
@@ -39,7 +40,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
     const mapDiv = document.createElement('div');
     const map = new google.maps.Map(mapDiv, {
       center: { lat: 37.5665, lng: 126.9780 },
-      zoom: 15,
+      zoom: 15
     });
     placesServiceRef.current = new google.maps.places.PlacesService(map);
     geocoderRef.current = new google.maps.Geocoder();  // Geocoder 초기화
@@ -100,7 +101,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
 
       placesServiceRef.current.textSearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          resolve(results.slice(0, 10)); // 최대 10개 결과
+          resolve(results.slice(0, 5)); // 최대 5개 결과
         } else {
           reject(new Error(`Places search failed: ${status}`));
         }
@@ -135,7 +136,8 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
           messages: [{
             role: 'user',
             content: input
-          }]
+          }],
+          collectedInfo // 현재까지 수집된 정보 전송
         })
       });
 
@@ -145,6 +147,11 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
 
       const response: ProcessedQuery = await chatResponse.json();
       console.log('API response:', response);
+
+      // 응답에서 받은 collectedInfo 업데이트
+      if (response.collectedInfo) {
+        updateCollectedInfo(response.collectedInfo);
+      }
 
       // 응답 타입에 따른 처리
       if (response.type === 'chat') {
