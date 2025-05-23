@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Place } from './MapComponent';
-import { useChatStore, Message } from '../store/chatStore';
+import { useChatStore } from '../store/chatStore';
 
 interface WelcomePopupProps {
   onClose: () => void;

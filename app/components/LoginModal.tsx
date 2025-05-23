@@ -9,8 +9,6 @@ interface LoginModalProps {
 }
 
 const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // 모달이 열릴 때 스크롤 방지
@@ -70,7 +68,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             {/* 로그인 헤더 */}
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">Log In</h2>
             <p className="text-center text-gray-600 mb-6 text-sm">
-              By continuing, you agree to Hash Korea's User Agreement and Privacy Policy.
+              By continuing, you agree to Hash Korea&apos;s User Agreement and Privacy Policy.
             </p>
             
             {/* 소셜 로그인 옵션 */}

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Place } from './MapComponent';
-import { useChatStore, Message } from '../store/chatStore';
+import { useChatStore } from '../store/chatStore';
 
 interface ChatInterfaceProps {
   onClose: () => void;
@@ -16,7 +16,11 @@ interface ProcessedQuery {
   location?: string;
   requirements?: string[];
   address?: string;
-  collectedInfo?: any;
+  collectedInfo?: {
+    location: string | null;
+    purpose: string | null;
+    preferences: string[] | null;
+  };
 }
 
 const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {

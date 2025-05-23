@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Place } from './MapComponent';
 
 interface InfoPanelProps {
@@ -89,9 +90,11 @@ const InfoPanel = ({ restaurant, onClose }: InfoPanelProps) => {
       {/* Bottom feature image */}
       <div className="mt-auto">
         <div className="relative">
-          <img 
+          <Image 
             src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" 
             alt="Food" 
+            width={800}
+            height={400}
             className="w-full h-48 object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 p-4 flex flex-col justify-end">

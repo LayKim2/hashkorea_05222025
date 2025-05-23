@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import LoginModal from './LoginModal';
 import { useSession } from 'next-auth/react';
 
@@ -192,20 +191,5 @@ const Header = () => {
     </>
   );
 };
-
-// 슬라이드인 애니메이션 추가
-const styles = `
-@keyframes slideIn {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-.animate-slide-in {
-  animation: slideIn 0.3s ease-out forwards;
-}
-`;
 
 export default Header; 

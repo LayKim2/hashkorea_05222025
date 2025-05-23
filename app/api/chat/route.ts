@@ -149,20 +149,17 @@ User input: ${body.messages[body.messages.length - 1].content}`;
         { error: 'Invalid response type from Gemini' },
         { status: 500 }
       );
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse Gemini response:', text);
       return NextResponse.json(
         { error: 'Failed to parse Gemini response', details: text },
         { status: 500 }
       );
     }
-  } catch (error) {
-    console.error('Gemini API error:', error);
+  } catch {
+    console.error('Gemini API error');
     return NextResponse.json(
-      { 
-        error: 'Failed to process the request', 
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to process the request' },
       { status: 500 }
     );
   }

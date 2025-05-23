@@ -1,7 +1,5 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { JWT } from "next-auth/jwt";
-import { Session } from "next-auth";
 
 // Extend the built-in types
 declare module "next-auth" {
@@ -44,7 +42,7 @@ const handler = NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account, profile }) {
       console.log("=== SignIn Callback ===");
       console.log("User:", user);
       console.log("Account:", account);

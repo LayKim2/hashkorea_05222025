@@ -32,9 +32,8 @@ interface MapComponentProps {
 
 const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
-  const [map, setMap] = useState<any>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
   
   // places prop이 변경될 때마다 로그 출력
   useEffect(() => {
@@ -66,15 +65,11 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
-          setLocationError(null);
         },
         (error) => {
           console.error("Error getting location:", error);
-          setLocationError("위치 정보를 가져올 수 없습니다.");
         }
       );
-    } else {
-      setLocationError("이 브라우저는 위치 정보를 지원하지 않습니다.");
     }
   }, []);
 
@@ -83,12 +78,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
   });
 
-  const onLoad = useCallback(function callback(map: any) {
+  const onLoad = useCallback(function callback(map: google.maps.Map) {
     setMap(map);
     console.log('Map loaded');
   }, []);
 
-  const onUnmount = useCallback(function callback(map: any) {
+  const onUnmount = useCallback(function callback() {
     setMap(null);
     console.log('Map unmounted');
   }, []);
