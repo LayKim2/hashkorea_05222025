@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ChatInterface from './ChatInterface';
-import { Place } from './MapComponent';
+import { Place } from '../map/MapComponent';
 
 interface ChatbotButtonProps {
   onPlacesFound: (places: Place[]) => void;

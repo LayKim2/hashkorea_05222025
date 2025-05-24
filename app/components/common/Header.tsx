@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import LoginModal from './LoginModal';
+import LoginModal from '../auth/LoginModal';
 import { useSession } from 'next-auth/react';
 
 const Header = () => {

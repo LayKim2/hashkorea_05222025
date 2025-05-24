@@ -1,8 +1,57 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Place } from './MapComponent';
-import { useChatStore } from '../store/chatStore';
+import { Place } from '../map/MapComponent';
+import { useChatStore } from '../../store/chatStore';
+import { motion } from 'framer-motion';
+
+// Window 객체에 SpeechRecognition 타입 추가
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
+// Web Speech API 타입 정의
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onstart: (event: Event) => void;
+  onend: (event: Event) => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+}
+
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message: string;
+}
 
 interface ChatInterfaceProps {
   onClose: () => void;
@@ -28,11 +77,99 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [recognitionError, setRecognitionError] = useState<string | null>(null);
+  const [transcript, setTranscript] = useState('');
+  const [isFinal, setIsFinal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const accumulatedTextRef = useRef(''); // 누적된 텍스트를 저장할 ref
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const { messages, addMessage, initializeStore, collectedInfo, updateCollectedInfo } = useChatStore();
+
+  // 음성인식 초기화 함수
+  const initializeSpeechRecognition = () => {
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        throw new Error('Speech recognition is not supported in this browser.');
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'ko-KR';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setRecognitionError(null);
+        setTranscript('');
+        setIsFinal(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const current = event.resultIndex;
+        const result = event.results[current];
+        const transcriptText = result[0].transcript;
+        
+        setTranscript(transcriptText);
+        setIsFinal(result.isFinal);
+        
+        if (transcriptText.trim() && result.isFinal) {
+          accumulatedTextRef.current = accumulatedTextRef.current 
+            ? `${accumulatedTextRef.current} ${transcriptText}`
+            : transcriptText;
+        }
+      };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        setRecognitionError(event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    } catch (error) {
+      setRecognitionError(error instanceof Error ? error.message : 'Failed to initialize speech recognition');
+    }
+  };
+
+  // 음성인식 시작/중지 토글 함수
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      setRecognitionError('Speech recognition is not initialized');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      try {
+        accumulatedTextRef.current = '';
+        recognitionRef.current.start();
+      } catch (error) {
+        setRecognitionError('Failed to start speech recognition');
+      }
+    }
+  };
+
+  // 컴포넌트 마운트 시 음성인식 초기화
+  useEffect(() => {
+    initializeSpeechRecognition();
+  }, []);
+
+  // 컴포넌트 언마운트 시 음성인식 정리
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
@@ -250,12 +387,6 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
     }
   };
 
-  const toggleListening = () => {
-    // 임시로 기능 비활성화
-    alert('Voice recognition feature is currently in preparation.');
-    return;
-  };
-
   return (
     <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
       {/* Header */}
@@ -319,24 +450,59 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
         </div>
       )}
 
-      {/* Speech Recognition Indicator */}
+      {/* Speech Recognition Popup */}
       {isListening && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg text-center">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center relative">
-              <div className="absolute w-full h-full rounded-full bg-red-400 animate-ping opacity-75"></div>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-500 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-3 shadow-2xl w-full max-w-[240px]"
+          >
+            <div className="text-center">
+              <div className="inline-block p-1.5 bg-gradient-to-r from-red-500 to-orange-400 rounded-full mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-bold text-gray-800 mb-1">Voice Recognition</h3>
+              <p className="text-xs text-gray-600 mb-3">Speak your message...</p>
+              <div className="flex justify-center gap-1.5">
+                <button 
+                  onClick={toggleListening}
+                  className="px-2.5 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg text-xs hover:from-gray-200 hover:to-gray-300 font-medium border border-gray-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    if (accumulatedTextRef.current.trim()) {
+                      const newInput = input ? `${input} ${accumulatedTextRef.current}` : accumulatedTextRef.current;
+                      toggleListening();
+                      setInput(newInput);
+                      setTimeout(() => {
+                        const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+                        if (submitButton && !submitButton.disabled) {
+                          submitButton.click();
+                        }
+                      }, 0);
+                    } else {
+                      toggleListening();
+                    }
+                  }}
+                  disabled={!isFinal}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                    isFinal 
+                      ? 'bg-gradient-to-r from-red-500 to-orange-400 text-white hover:from-red-600 hover:to-orange-500' 
+                      : 'bg-gradient-to-r from-gray-300 to-gray-400 text-white cursor-not-allowed'
+                  }`}
+                >
+                  Done
+                </button>
+              </div>
             </div>
-            <p className="text-gray-800 font-medium">Listening...</p>
-            <button 
-              onClick={() => setIsListening(false)}
-              className="mt-3 px-4 py-2 bg-gray-200 rounded-lg text-sm hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
+          </motion.div>
         </div>
       )}
 

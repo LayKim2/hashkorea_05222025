@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from 'react';
-import Header from './components/Header';
-import MapComponent, { Place } from './components/MapComponent';
-import InfoPanel from './components/InfoPanel';
-import ChatbotButton from './components/ChatbotButton';
-import WelcomePopup from './components/WelcomePopup';
+import Header from './components/common/Header';
+import MapComponent, { Place } from './components/map/MapComponent';
+import InfoPanel from './components/map/InfoPanel';
+import ChatbotButton from './components/chat/ChatbotButton';
+import WelcomePopup from './components/chat/WelcomePopup';
 
 export default function Home() {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
