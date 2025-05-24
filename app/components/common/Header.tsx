@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import LoginModal from '../auth/LoginModal';
 import { useSession } from 'next-auth/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -111,83 +112,109 @@ const Header = () => {
       </header>
       
       {/* Modern Mobile menu */}
-      {mobileMenuOpen && (
-        <>
-          {/* Background overlay */}
-          <div 
-            className="fixed inset-0 z-40"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-            onClick={() => setMobileMenuOpen(false)}
-          ></div>
-          
-          {/* Menu sidebar - modern design */}
-          <div className="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 overflow-hidden flex flex-col">
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-400 rounded-lg flex items-center justify-center text-white shadow-sm">
-                  <span className="text-lg font-bold">#</span>
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Background overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            {/* Menu sidebar - modern design */}
+            <motion.div 
+              initial={{ x: -320 }}
+              animate={{ x: 0 }}
+              exit={{ x: -320 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
+            >
+              {/* Header */}
+              <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-400 rounded-lg flex items-center justify-center text-white shadow-sm">
+                    <span className="text-lg font-bold">#</span>
+                  </div>
+                  <span className="font-bold text-gray-800 text-xl">Hash Korea</span>
                 </div>
-                <span className="font-bold text-gray-800 text-xl">Hash Korea</span>
-              </div>
-              <button 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-gray-400 hover:text-gray-600 focus:outline-none"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {/* User profile area */}
-            <div className="mx-6 mt-6 mb-8 flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h4 className="text-sm font-medium text-gray-900">Welcome</h4>
-                <p className="text-xs text-gray-500">Sign in to access all features</p>
-              </div>
-            </div>
-            
-            {/* Menu items */}
-            <div className="px-4 pb-8 overflow-y-auto flex-grow">
-              <div className="mb-4">
-                <h3 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</h3>
-                <nav className="mt-2 space-y-1">
-                  <Link 
-                    href="#" 
-                    className="flex items-center px-4 py-3 text-base font-medium text-red-600 bg-red-50 rounded-xl"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                    </svg>
-                    Tour
-                  </Link>
-                </nav>
-              </div>
-            </div>
-            
-            {/* Bottom actions */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-              <div>
                 <button 
-                  onClick={() => {
-                    setLoginModalOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center py-3 px-4 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-orange-400 rounded-xl hover:from-red-600 hover:to-orange-500"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 focus:outline-none"
                 >
-                  <span>Login</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
-            </div>
-          </div>
-        </>
-      )}
+              
+              {/* User profile area */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mx-6 mt-6 mb-8 flex items-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-900">Welcome</h4>
+                  <p className="text-xs text-gray-500">Sign in to access all features</p>
+                </div>
+              </motion.div>
+              
+              {/* Menu items */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="px-4 pb-8 overflow-y-auto flex-grow"
+              >
+                <div className="mb-4">
+                  <h3 className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</h3>
+                  <nav className="mt-2 space-y-1">
+                    <Link 
+                      href="#" 
+                      className="flex items-center px-4 py-3 text-base font-medium text-red-600 bg-red-50 rounded-xl"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                      </svg>
+                      Tour
+                    </Link>
+                  </nav>
+                </div>
+              </motion.div>
+              
+              {/* Bottom actions */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="px-6 py-4 bg-gray-50 border-t border-gray-100"
+              >
+                <div>
+                  <button 
+                    onClick={() => {
+                      setLoginModalOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center py-3 px-4 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-orange-400 rounded-xl hover:from-red-600 hover:to-orange-500"
+                  >
+                    <span>Login</span>
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 };
