@@ -9,19 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/core": "0.34.2",
-    "@auth/nextjs": "^0.0.0-380f8d56",
+    "@formatjs/intl-localematcher": "^0.6.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@google/generative-ai": "^0.24.1",
     "@react-google-maps/api": "^2.20.6",
+    "@types/negotiator": "^0.6.3",
     "framer-motion": "^12.12.2",
+    "i18next": "^25.2.0",
+    "i18next-resources-to-backend": "^1.2.1",
+    "negotiator": "^1.0.0",
     "next": "13.5.11",
     "next-auth": "4.24.11",
-    "openai": "^4.95.1",
+    "next-i18next": "^15.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^15.5.2",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from './components/common/Header';
 import MapComponent, { Place } from './components/map/MapComponent';
 import InfoPanel from './components/map/InfoPanel';
@@ -8,6 +9,7 @@ import ChatbotButton from './components/chat/ChatbotButton';
 import WelcomePopup from './components/chat/WelcomePopup';
 
 export default function Home() {
+  const { t } = useTranslation('common');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
   const [places, setPlaces] = useState<Place[]>([]);

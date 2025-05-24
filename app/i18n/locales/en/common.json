@@ -1,0 +1,15 @@
+{
+  "header": {
+    "slogan": "Everything about Korea at a glance",
+    "login": "Login",
+    "search": "Search places...",
+    "welcome": "Welcome",
+    "signIn": "Sign in to access all features",
+    "main": "Main",
+    "tour": "Tour"
+  },
+  "map": {
+    "loading": "Loading map...",
+    "error": "Error loading map"
+  }
+} 
