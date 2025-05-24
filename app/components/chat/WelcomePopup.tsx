@@ -306,7 +306,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
   return (
     <AnimatePresence>
       {isVisible && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 flex items-center justify-center z-[9999]">
           {/* 배경 오버레이 */}
           <motion.div
             initial={{ opacity: 0 }}

@@ -190,7 +190,7 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
           position: 'absolute',
           top: 11,
           right: 62,
-          zIndex: 10,
+          zIndex: 1000,
           background: '#fff',
           border: '1px solid #ddd',
           borderRadius: '50%',
@@ -227,19 +227,21 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
         onLoad={onLoad}
         onUnmount={onUnmount}
         options={{
+          zoomControl: true,
+          fullscreenControl: true,
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+            position: google.maps.ControlPosition.TOP_LEFT
+          },
+          streetViewControl: true,
+          scaleControl: true,
           styles: [
             {
               featureType: "poi",
               elementType: "labels",
-              stylers: [{ visibility: "on" }],
-            },
-          ],
-          disableDefaultUI: false,
-          zoomControl: true,
-          fullscreenControl: true,
-          mapTypeControl: false,
-          streetViewControl: false,
-          scaleControl: false
+              stylers: [{ visibility: "on" }]
+            }
+          ]
         }}
       >
         {/* 현재 위치 마커 */}

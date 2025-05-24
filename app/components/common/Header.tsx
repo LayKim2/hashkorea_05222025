@@ -119,11 +119,6 @@ const Header = () => {
             {/* Mobile search */}
             <div className="md:hidden flex items-center flex-1 min-w-0">
               <div className="relative flex items-center w-full">
-                <input
-                  type="text"
-                  placeholder={t('header.search')}
-                  className="w-full pl-4 pr-12 py-2 text-sm text-gray-700 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
-                />
                 <button className="absolute right-1 text-gray-600 hover:text-gray-900 bg-gray-100 p-2 rounded-full transition-all hover:bg-gray-200">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
@@ -141,13 +136,6 @@ const Header = () => {
                 {t('header.login')}
               </button>
             </div>
-            
-            {/* Profile icon - mobile */}
-            <button className="sm:hidden text-gray-600 hover:text-gray-900 bg-gray-100 p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.35-.03-.696-.085-1.036A5 5 0 0010 11z" clipRule="evenodd" />
-              </svg>
-            </button>
             
             {/* Mobile menu button */}
             <button 

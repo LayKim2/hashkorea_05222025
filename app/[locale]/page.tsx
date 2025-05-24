@@ -32,7 +32,6 @@ export default function LocalePage({
   };
 
   const handlePlacesFound = (newPlaces: Place[]) => {
-    console.log('Home - Received places:', newPlaces);
     setPlaces(newPlaces);
   };
 
@@ -48,7 +47,7 @@ export default function LocalePage({
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative mt-[72px]">
         <div className="w-full h-full">
           <MapComponent 
             places={places}
