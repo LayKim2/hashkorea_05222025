@@ -1,0 +1,36 @@
+{
+  "header": {
+    "slogan": "韓国のすべてが一目で分かる",
+    "login": "ログイン",
+    "search": "場所を検索...",
+    "welcome": "ようこそ",
+    "signIn": "すべての機能を使用するにはログインしてください",
+    "main": "メイン",
+    "tour": "ツアー"
+  },
+  "map": {
+    "loading": "地図を読み込み中...",
+    "error": "地図の読み込み中にエラーが発生しました"
+  },
+  "welcome": {
+    "title": "あなただけの場所を見つけましょう",
+    "discover": "韓国を探索",
+    "foodGuide": "現地グルメガイド",
+    "travelTips": "旅行のヒント",
+    "voiceRecognition": "音声認識",
+    "speakMessage": "メッセージを話してください...",
+    "cancel": "キャンセル",
+    "done": "完了",
+    "inputPlaceholder": "訪れたい場所や食べたい料理について聞いてください...",
+    "send": "送信"
+  },
+  "chat": {
+    "title": "旅行スポットアシスタント",
+    "searching": "検索中...",
+    "voiceRecognition": "音声認識",
+    "speakMessage": "メッセージを話してください...",
+    "cancel": "キャンセル",
+    "done": "完了",
+    "inputPlaceholder": "メッセージを入力してください..."
+  }
+} 

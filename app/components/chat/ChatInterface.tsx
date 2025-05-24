@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Place } from '../map/MapComponent';
 import { useChatStore } from '../../store/chatStore';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Window 객체에 SpeechRecognition 타입 추가
 declare global {
@@ -73,6 +74,7 @@ interface ProcessedQuery {
 }
 
 const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
+  const { t } = useTranslation('common');
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -397,7 +399,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h3 className="font-medium">Travel Spot Assistant</h3>
+          <h3 className="font-medium">{t('chat.title')}</h3>
         </div>
         <button onClick={onClose} className="text-white hover:text-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -445,7 +447,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             </div>
-            <p className="text-gray-800 font-medium">Searching...</p>
+            <p className="text-gray-800 font-medium">{t('chat.searching')}</p>
           </div>
         </div>
       )}
@@ -466,14 +468,14 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
               </div>
-              <h3 className="text-base font-bold text-gray-800 mb-1">Voice Recognition</h3>
-              <p className="text-xs text-gray-600 mb-3">Speak your message...</p>
+              <h3 className="text-base font-bold text-gray-800 mb-1">{t('chat.voiceRecognition')}</h3>
+              <p className="text-xs text-gray-600 mb-3">{t('chat.speakMessage')}</p>
               <div className="flex justify-center gap-1.5">
                 <button 
                   onClick={toggleListening}
                   className="px-2.5 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-lg text-xs hover:from-gray-200 hover:to-gray-300 font-medium border border-gray-200 transition-all"
                 >
-                  Cancel
+                  {t('chat.cancel')}
                 </button>
                 <button 
                   onClick={() => {
@@ -498,7 +500,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
                       : 'bg-gradient-to-r from-gray-300 to-gray-400 text-white cursor-not-allowed'
                   }`}
                 >
-                  Done
+                  {t('chat.done')}
                 </button>
               </div>
             </div>
@@ -512,7 +514,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter your message..."
+          placeholder={t('chat.inputPlaceholder')}
           className="flex-1 py-2 px-3 rounded-full bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
           ref={inputRef}
         />

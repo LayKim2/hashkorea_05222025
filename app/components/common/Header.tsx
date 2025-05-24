@@ -24,7 +24,7 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'ko');
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   
   console.log('Client Session Status:', status);
   console.log('Client Session Data:', session);

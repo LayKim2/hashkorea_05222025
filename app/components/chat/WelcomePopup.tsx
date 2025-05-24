@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Place } from '../map/MapComponent';
 import { useChatStore } from '../../store/chatStore';
+import { useTranslation } from 'react-i18next';
 
 // Window 객체에 SpeechRecognition 타입 추가
 declare global {
@@ -73,6 +74,7 @@ interface ProcessedQuery {
 }
 
 const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
+  const { t } = useTranslation('common');
   const [isVisible, setIsVisible] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -350,7 +352,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                 </svg>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-500 to-orange-400 bg-clip-text text-transparent mb-2 sm:mb-3">
-                Find Your Personalized Place
+                {t('welcome.title')}
               </h2>
             </div>
 
@@ -360,19 +362,19 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-xs sm:text-sm text-gray-700">Discover Korea</span>
+                <span className="text-xs sm:text-sm text-gray-700">{t('welcome.discover')}</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                <span className="text-xs sm:text-sm text-gray-700">Local Food Guide</span>
+                <span className="text-xs sm:text-sm text-gray-700">{t('welcome.foodGuide')}</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-xs sm:text-sm text-gray-700">Travel Tips</span>
+                <span className="text-xs sm:text-sm text-gray-700">{t('welcome.travelTips')}</span>
               </div>
             </div>
 
@@ -433,14 +435,14 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                         </svg>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">Voice Recognition</h3>
-                      <p className="text-gray-600 mb-6">Speak your message...</p>
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">{t('welcome.voiceRecognition')}</h3>
+                      <p className="text-gray-600 mb-6">{t('welcome.speakMessage')}</p>
                       <div className="flex justify-center gap-3">
                         <button 
                           onClick={toggleListening}
                           className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl text-sm hover:from-gray-200 hover:to-gray-300 font-medium border border-gray-200 transition-all"
                         >
-                          Cancel
+                          {t('welcome.cancel')}
                         </button>
                         <button 
                           onClick={() => {
@@ -465,7 +467,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                               : 'bg-gradient-to-r from-gray-300 to-gray-400 text-white cursor-not-allowed'
                           }`}
                         >
-                          Done
+                          {t('welcome.done')}
                         </button>
                       </div>
                     </div>
@@ -481,7 +483,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                       type="text"
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      placeholder="Ask about places to visit or food to try..."
+                      placeholder={t('welcome.inputPlaceholder')}
                       className="flex-1 border border-gray-200 rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-900"
                       disabled={isLoading}
                     />
@@ -499,7 +501,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                       className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50 flex items-center gap-2 shadow-md"
                       disabled={isLoading}
                     >
-                      <span className="hidden sm:inline">Send</span>
+                      <span className="hidden sm:inline">{t('welcome.send')}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>

@@ -1,24 +1,9 @@
 // 브라우저의 언어 설정을 감지하여 적절한 언어로 리다이렉트하는 역할을 합니다.
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { match as matchLocale } from '@formatjs/intl-localematcher';
-import Negotiator from 'negotiator';
 
 const locales = ['en', 'ko', 'ja', 'zh'];
 const defaultLocale = 'en';
-
-function getLocale(request: NextRequest): string {
-  const negotiatorHeaders: Record<string, string> = {};
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
-
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  
-  try {
-    return matchLocale(languages, locales, defaultLocale);
-  } catch (error) {
-    return defaultLocale;
-  }
-}
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -30,9 +15,9 @@ export function middleware(request: NextRequest) {
 
   // Redirect if there is no locale
   if (pathnameIsMissingLocale) {
-    const locale = getLocale(request);
+    // 기본값을 영어로 강제 설정
     return NextResponse.redirect(
-      new URL(`/${locale}${pathname === '/' ? '' : pathname}`, request.url)
+      new URL(`/en${pathname === '/' ? '' : pathname}`, request.url)
     );
   }
 }

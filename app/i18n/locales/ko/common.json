@@ -11,5 +11,26 @@
   "map": {
     "loading": "지도 로딩 중...",
     "error": "지도를 불러오는 중 오류가 발생했습니다"
+  },
+  "welcome": {
+    "title": "나만의 맞춤 장소 찾기",
+    "discover": "한국 탐험하기",
+    "foodGuide": "현지 음식 가이드",
+    "travelTips": "여행 팁",
+    "voiceRecognition": "음성 인식",
+    "speakMessage": "메시지를 말씀해주세요...",
+    "cancel": "취소",
+    "done": "완료",
+    "inputPlaceholder": "방문할 장소나 먹을 음식에 대해 물어보세요...",
+    "send": "전송"
+  },
+  "chat": {
+    "title": "여행 장소 도우미",
+    "searching": "검색 중...",
+    "voiceRecognition": "음성 인식",
+    "speakMessage": "메시지를 말씀해주세요...",
+    "cancel": "취소",
+    "done": "완료",
+    "inputPlaceholder": "메시지를 입력하세요..."
   }
 } 

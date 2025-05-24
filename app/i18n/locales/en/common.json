@@ -11,5 +11,26 @@
   "map": {
     "loading": "Loading map...",
     "error": "Error loading map"
+  },
+  "welcome": {
+    "title": "Find Your Personalized Place",
+    "discover": "Discover Korea",
+    "foodGuide": "Local Food Guide",
+    "travelTips": "Travel Tips",
+    "voiceRecognition": "Voice Recognition",
+    "speakMessage": "Speak your message...",
+    "cancel": "Cancel",
+    "done": "Done",
+    "inputPlaceholder": "Ask about places to visit or food to try...",
+    "send": "Send"
+  },
+  "chat": {
+    "title": "Travel Spot Assistant",
+    "searching": "Searching...",
+    "voiceRecognition": "Voice Recognition",
+    "speakMessage": "Speak your message...",
+    "cancel": "Cancel",
+    "done": "Done",
+    "inputPlaceholder": "Enter your message..."
   }
 } 
