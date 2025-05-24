@@ -8,12 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useRouter, usePathname } from 'next/navigation';
 import i18n from '../../i18n/client';
+import ReactCountryFlag from "react-country-flag";
 
 const languages = [
-  { code: 'en', name: 'English', flag: '/flags/british.png' },
-  { code: 'ko', name: '한국어', flag: '/flags/south-korea.png' },
-  { code: 'ja', name: '日本語', flag: '/flags/japan.png' },
-  { code: 'zh', name: '中文', flag: '/flags/china.png' }
+  { code: 'en', name: 'English', countryCode: 'GB' },
+  { code: 'ko', name: '한국어', countryCode: 'KR' },
+  { code: 'ja', name: '日本語', countryCode: 'JP' },
+  { code: 'zh', name: '中文', countryCode: 'CN' }
 ];
 
 const Header = () => {
@@ -157,36 +158,41 @@ const Header = () => {
             <div className="relative">
               <button
                 onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <img 
-                  src={languages.find(lang => lang.code === currentLanguage)?.flag}
-                  alt="Current language"
-                  className="w-6 h-4 object-cover rounded-sm"
+                <ReactCountryFlag
+                  countryCode={languages.find(lang => lang.code === currentLanguage)?.countryCode || 'GB'}
+                  svg
+                  style={{
+                    width: '2em',
+                    height: '2em',
+                  }}
+                  className="rounded-sm shadow-sm hover:scale-105 transition-transform"
                 />
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
               </button>
 
               {isLanguageMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[1001]">
-                  <div className="py-1" role="menu" aria-orientation="vertical">
+                <div className="absolute right-0 mt-2 w-32 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[1001] overflow-hidden">
+                  <div className="py-2 px-2" role="menu" aria-orientation="vertical">
                     {languages.map((language) => (
                       <button
                         key={language.code}
                         onClick={() => handleLanguageChange(language.code)}
-                        className={`flex items-center w-full text-left px-4 py-2 text-sm ${
+                        className={`flex items-center justify-center w-full p-2 rounded-lg transition-all ${
                           currentLanguage === language.code
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-gray-100 scale-110'
+                            : 'hover:bg-gray-50 hover:scale-105'
                         }`}
                         role="menuitem"
                       >
-                        <img 
-                          src={language.flag}
-                          alt={language.name}
-                          className="w-6 h-4 object-cover rounded-sm mr-2"
+                        <ReactCountryFlag
+                          countryCode={language.countryCode}
+                          svg
+                          style={{
+                            width: '1.75em',
+                            height: '1.75em',
+                          }}
+                          className="rounded-sm shadow-sm"
                         />
                       </button>
                     ))}

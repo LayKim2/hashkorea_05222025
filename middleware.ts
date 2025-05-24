@@ -10,7 +10,6 @@ export function middleware(request: NextRequest) {
   
   // 정적 파일 요청은 건너뛰기
   if (
-    pathname.startsWith('/flags/') || 
     pathname.startsWith('/images/') || 
     pathname.startsWith('/icons/') ||
     pathname.endsWith('.png') ||
