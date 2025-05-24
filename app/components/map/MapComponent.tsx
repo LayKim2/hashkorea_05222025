@@ -94,12 +94,14 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
       setUserLocation(center);
       setIsRequestingLocation(false);
     }
-  }, [isRequestingLocation]);
+  }, []);
 
-  // 컴포넌트 마운트 시 위치 정보 가져오기
+  // 컴포넌트 마운트 시 한 번만 위치 정보 가져오기
   useEffect(() => {
-    getCurrentLocation();
-  }, [getCurrentLocation]);
+    if (!userLocation) {
+      getCurrentLocation();
+    }
+  }, []);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',

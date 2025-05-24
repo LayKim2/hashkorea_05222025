@@ -10,10 +10,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import i18n from '../../i18n/client';
 
 const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'ko', name: '한국어' },
-  { code: 'ja', name: '日本語' },
-  { code: 'zh', name: '中文' }
+  { code: 'en', name: 'English', flag: '/flags/british.png' },
+  { code: 'ko', name: '한국어', flag: '/flags/south-korea.png' },
+  { code: 'ja', name: '日本語', flag: '/flags/japan.png' },
+  { code: 'zh', name: '中文', flag: '/flags/china.png' }
 ];
 
 const Header = () => {
@@ -159,7 +159,11 @@ const Header = () => {
                 onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
               >
-                <span>{languages.find(lang => lang.code === currentLanguage)?.name}</span>
+                <img 
+                  src={languages.find(lang => lang.code === currentLanguage)?.flag}
+                  alt="Current language"
+                  className="w-6 h-4 object-cover rounded-sm"
+                />
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -172,14 +176,18 @@ const Header = () => {
                       <button
                         key={language.code}
                         onClick={() => handleLanguageChange(language.code)}
-                        className={`block w-full text-left px-4 py-2 text-sm ${
+                        className={`flex items-center w-full text-left px-4 py-2 text-sm ${
                           currentLanguage === language.code
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-700 hover:bg-gray-50'
                         }`}
                         role="menuitem"
                       >
-                        {language.name}
+                        <img 
+                          src={language.flag}
+                          alt={language.name}
+                          className="w-6 h-4 object-cover rounded-sm mr-2"
+                        />
                       </button>
                     ))}
                   </div>

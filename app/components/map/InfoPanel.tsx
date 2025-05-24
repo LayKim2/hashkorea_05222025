@@ -22,7 +22,7 @@ const InfoPanel = ({ restaurant, onClose }: InfoPanelProps) => {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg h-[calc(100vh-2rem)] overflow-y-auto w-full max-w-md z-10 flex flex-col">
+    <div className="bg-white shadow-lg rounded-lg h-[calc(100vh-2rem)] overflow-y-auto w-full max-w-md z-10 flex flex-col mt-16">
       {/* Header with rating */}
       <div className="p-4 pb-2">
         <div className="flex text-amber-400 mb-2">

@@ -8,6 +8,21 @@ const defaultLocale = 'en';
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
+  // 정적 파일 요청은 건너뛰기
+  if (
+    pathname.startsWith('/flags/') || 
+    pathname.startsWith('/images/') || 
+    pathname.startsWith('/icons/') ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.jpeg') ||
+    pathname.endsWith('.gif') ||
+    pathname.endsWith('.svg') ||
+    pathname.endsWith('.ico')
+  ) {
+    return NextResponse.next();
+  }
+  
   // Check if there is any supported locale in the pathname
   const pathnameIsMissingLocale = locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
