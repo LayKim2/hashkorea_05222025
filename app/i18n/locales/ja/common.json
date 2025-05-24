@@ -1,21 +1,21 @@
 {
   "header": {
-    "slogan": "韓国のすべてが一目で分かる",
+    "slogan": "あなただけの韓国旅行を見つける",
     "login": "ログイン",
     "search": "場所を検索...",
     "welcome": "ようこそ",
-    "signIn": "すべての機能を使用するにはログインしてください",
+    "signIn": "すべての機能にアクセスするにはログインしてください",
     "main": "メイン",
     "tour": "ツアー"
   },
   "map": {
     "loading": "地図を読み込み中...",
-    "error": "地図の読み込み中にエラーが発生しました"
+    "error": "地図の読み込みエラー"
   },
   "welcome": {
-    "title": "あなただけの場所を見つけましょう",
-    "discover": "韓国を探索",
-    "foodGuide": "現地グルメガイド",
+    "title": "パーソナライズされた場所を見つける",
+    "discover": "韓国を発見",
+    "foodGuide": "現地の食べ物ガイド",
     "travelTips": "旅行のヒント",
     "voiceRecognition": "音声認識",
     "speakMessage": "メッセージを話してください...",
@@ -31,6 +31,7 @@
     "speakMessage": "メッセージを話してください...",
     "cancel": "キャンセル",
     "done": "完了",
-    "inputPlaceholder": "メッセージを入力してください..."
+    "inputPlaceholder": "メッセージを入力してください...",
+    "initialMessage": "どのような場所をお探しですか？"
   }
 } 

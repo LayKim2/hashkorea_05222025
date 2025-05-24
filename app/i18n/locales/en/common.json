@@ -1,6 +1,6 @@
 {
   "header": {
-    "slogan": "Everything about Korea at a glance",
+    "slogan": "Find Your Personalized Place",
     "login": "Login",
     "search": "Search places...",
     "welcome": "Welcome",
@@ -31,6 +31,7 @@
     "speakMessage": "Speak your message...",
     "cancel": "Cancel",
     "done": "Done",
-    "inputPlaceholder": "Enter your message..."
+    "inputPlaceholder": "Enter your message...",
+    "initialMessage": "What kind of place are you looking for?"
   }
 } 

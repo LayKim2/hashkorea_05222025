@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, usePathname } from 'next/navigation';
 import i18n from '../../i18n/client';
 import ReactCountryFlag from "react-country-flag";
+import { useChatStore } from '../../store/chatStore';
 
 const languages = [
   { code: 'en', name: 'English', countryCode: 'GB' },
@@ -26,6 +27,7 @@ const Header = () => {
   const pathname = usePathname();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+  const clearMessages = useChatStore(state => state.clearMessages);
   
   console.log('Client Session Status:', status);
   console.log('Client Session Data:', session);
@@ -64,6 +66,9 @@ const Header = () => {
         // 현재 경로에 언어 코드가 없는 경우
         newPath = `/${langCode}${pathname}`;
       }
+      
+      // 채팅 메시지 초기화
+      clearMessages();
       
       // 라우터를 사용하여 페이지 이동
       router.push(newPath);

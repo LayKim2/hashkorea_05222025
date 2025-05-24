@@ -1,36 +1,37 @@
 {
   "header": {
-    "slogan": "韩国的一切尽在眼前",
+    "slogan": "寻找您的专属韩国之旅",
     "login": "登录",
     "search": "搜索地点...",
     "welcome": "欢迎",
-    "signIn": "登录以使用所有功能",
+    "signIn": "登录以访问所有功能",
     "main": "主页",
     "tour": "旅游"
   },
   "map": {
-    "loading": "正在加载地图...",
-    "error": "加载地图时出错"
+    "loading": "加载地图中...",
+    "error": "地图加载错误"
   },
   "welcome": {
-    "title": "找到属于您的地方",
+    "title": "寻找您的个性化地点",
     "discover": "探索韩国",
     "foodGuide": "当地美食指南",
     "travelTips": "旅行贴士",
     "voiceRecognition": "语音识别",
-    "speakMessage": "请说出您的消息...",
+    "speakMessage": "说出您的消息...",
     "cancel": "取消",
     "done": "完成",
-    "inputPlaceholder": "询问想去的地方或想吃的食物...",
+    "inputPlaceholder": "询问想去的地方或想尝试的美食...",
     "send": "发送"
   },
   "chat": {
-    "title": "旅游景点助手",
+    "title": "旅游地点助手",
     "searching": "搜索中...",
     "voiceRecognition": "语音识别",
-    "speakMessage": "请说出您的消息...",
+    "speakMessage": "说出您的消息...",
     "cancel": "取消",
     "done": "完成",
-    "inputPlaceholder": "请输入您的消息..."
+    "inputPlaceholder": "输入您的消息...",
+    "initialMessage": "您在寻找什么样的地方？"
   }
 } 

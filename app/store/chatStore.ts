@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import i18n from '../i18n/client';
 
 export interface Message {
   id: string;
@@ -22,13 +23,6 @@ interface ChatStore {
   updateCollectedInfo: (info: Partial<CollectedInfo>) => void;
   resetCollectedInfo: () => void;
 }
-
-// 초기 메시지 템플릿
-const INITIAL_MESSAGE_TEMPLATE = {
-  id: '1',
-  type: 'ai' as const,
-  text: 'What kind of place are you looking for?',
-};
 
 // 초기 collectedInfo
 const INITIAL_COLLECTED_INFO: CollectedInfo = {
@@ -54,7 +48,9 @@ export const useChatStore = create<ChatStore>((set) => ({
     // 초기 메시지 추가
     return {
       messages: [{
-        ...INITIAL_MESSAGE_TEMPLATE,
+        id: '1',
+        type: 'ai',
+        text: i18n.t('chat.initialMessage'),
         timestamp: new Date().toISOString()
       }],
       collectedInfo: INITIAL_COLLECTED_INFO

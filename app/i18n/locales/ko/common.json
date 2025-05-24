@@ -1,6 +1,6 @@
 {
   "header": {
-    "slogan": "한국의 모든 것을 한눈에",
+    "slogan": "나만의 맞춤 여행지 찾기",
     "login": "로그인",
     "search": "장소 검색...",
     "welcome": "환영합니다",
@@ -31,6 +31,7 @@
     "speakMessage": "메시지를 말씀해주세요...",
     "cancel": "취소",
     "done": "완료",
-    "inputPlaceholder": "메시지를 입력하세요..."
+    "inputPlaceholder": "메시지를 입력하세요...",
+    "initialMessage": "어떤 장소를 찾고 계신가요?"
   }
 } 
