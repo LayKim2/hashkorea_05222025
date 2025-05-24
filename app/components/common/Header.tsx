@@ -10,8 +10,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import i18n from '../../i18n/client';
 
 const languages = [
-  { code: 'ko', name: '한국어' },
   { code: 'en', name: 'English' },
+  { code: 'ko', name: '한국어' },
   { code: 'ja', name: '日本語' },
   { code: 'zh', name: '中文' }
 ];
@@ -43,11 +43,34 @@ const Header = () => {
   }, [mobileMenuOpen]);
 
   const handleLanguageChange = async (langCode: string) => {
-    setCurrentLanguage(langCode);
-    setIsLanguageMenuOpen(false);
-    await i18n.changeLanguage(langCode);
-    const newPath = pathname.replace(/^\/[^\/]+/, `/${langCode}`);
-    router.push(newPath);
+    try {
+      setCurrentLanguage(langCode);
+      setIsLanguageMenuOpen(false);
+      
+      // i18n 언어 변경
+      await i18n.changeLanguage(langCode);
+      
+      // 현재 경로에서 언어 코드 추출
+      const currentLang = pathname.split('/')[1];
+      const isCurrentLangValid = languages.some(lang => lang.code === currentLang);
+      
+      // 새로운 경로 생성
+      let newPath = pathname;
+      if (isCurrentLangValid) {
+        // 현재 경로에 유효한 언어 코드가 있는 경우
+        newPath = pathname.replace(/^\/[^\/]+/, `/${langCode}`);
+      } else {
+        // 현재 경로에 언어 코드가 없는 경우
+        newPath = `/${langCode}${pathname}`;
+      }
+      
+      // 라우터를 사용하여 페이지 이동
+      router.push(newPath);
+    } catch (error) {
+      console.error('Language change error:', error);
+      // 에러 발생 시 원래 언어로 복구
+      setCurrentLanguage(i18n.language || 'en');
+    }
   };
 
   return (

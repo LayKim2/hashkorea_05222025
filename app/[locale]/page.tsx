@@ -1,14 +1,18 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Header from './components/common/Header';
-import MapComponent, { Place } from './components/map/MapComponent';
-import InfoPanel from './components/map/InfoPanel';
-import ChatbotButton from './components/chat/ChatbotButton';
-import WelcomePopup from './components/chat/WelcomePopup';
+import Header from '../components/common/Header';
+import MapComponent, { Place } from '../components/map/MapComponent';
+import InfoPanel from '../components/map/InfoPanel';
+import ChatbotButton from '../components/chat/ChatbotButton';
+import WelcomePopup from '../components/chat/WelcomePopup';
 
-export default function Home() {
+export default function LocalePage({
+  params: { locale }
+}: {
+  params: { locale: string };
+}) {
   const { t } = useTranslation('common');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
@@ -57,4 +61,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
+} 
