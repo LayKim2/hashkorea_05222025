@@ -5,6 +5,7 @@ import { Place } from '../map/MapComponent';
 import { useChatStore } from '../../store/chatStore';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { PlaceType, mapPlaceType } from '../../utils/placeTypes';
 
 // Window 객체에 SpeechRecognition 타입 추가
 declare global {
@@ -348,6 +349,10 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
           const lat = place.geometry?.location?.lat();
           const lng = place.geometry?.location?.lng();
           console.log(`Place ${index} coordinates:`, { lat, lng }); // 좌표 확인용 로그
+          console.log(`Place ${index} types:`, place.types); // 타입 확인용 로그
+
+          const mappedType = mapPlaceType(place.types?.[0] || 'unknown');
+          console.log(`Place ${index} mapped type:`, mappedType); // 매핑된 타입 확인용 로그
 
           return {
             id: place.place_id || `place-${index}`,
@@ -356,8 +361,8 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
               lat: lat || 0,
               lng: lng || 0
             },
-            type: place.types?.[0] || 'unknown',
-            address: place.formatted_address
+            type: mappedType,
+            address: place.vicinity
           };
         });
 
@@ -366,7 +371,7 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
 
         // 검색 결과 메시지 추가
         const placesDescription = places.map((place, index) => 
-          `${index + 1}. ${place.name} (${place.formatted_address || response.address || '주소 없음'})`
+          `${index + 1}. ${place.name} (${place.formatted_address || place.vicinity || response.address || '주소 없음'})`
         ).join('\n');
 
         const resultMessage = {

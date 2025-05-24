@@ -4,6 +4,14 @@ import { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow, OverlayView } from '@react-google-maps/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons';
+import Lottie from 'lottie-react';
+import cafeAnimation from '../../../public/icons/cafe.json';
+import foodAnimation from '../../../public/icons/food.json';
+import landmarkAnimation from '../../../public/icons/landmark.json';
+import drinkAnimation from '../../../public/icons/drink.json';
+import clubAnimation from '../../../public/icons/club.json';
+import othersAnimation from '../../../public/icons/others.json';
+import { PlaceType, mapPlaceType } from '../../utils/placeTypes';
 
 const containerStyle = {
   width: '100%',
@@ -23,7 +31,7 @@ export interface Place {
     lat: number;
     lng: number;
   };
-  type: string;
+  type: PlaceType;
   address?: string;
 }
 
@@ -118,37 +126,6 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
     console.log('Map unmounted');
   }, []);
 
-  /**
-   * 장소 유형에 따른 마커 아이콘 스타일 설정
-   * @param type 장소 유형 (음식점, 관광지, 기타)
-   * @returns 마커 아이콘 설정
-   */
-  const getMarkerIcon = (type: string) => {
-    if (type.includes('restaurant') || type.includes('cafe') || type.includes('food')) {
-      return {
-        url: 'icons/fastfood.png', 
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 32)
-      };
-    }
-    // 관광지 (명소, 박물관, 공원 등)
-    else if (type.includes('tourist') || type.includes('attraction') || type.includes('museum')) {
-      return {
-        url: '/icons/landmark.png',
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 32)
-      };
-    }
-    // 기타 장소 (쇼핑몰, 편의시설 등)
-    else {
-      return {
-        url: '/icons/other.png',
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 32)
-      };
-    }
-  };
-
   const handleMarkerClick = (place: Place) => {
     setSelectedPlace(place);
     if (onSelectPlace) {
@@ -190,7 +167,7 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
           position: 'absolute',
           top: 11,
           right: 62,
-          zIndex: 1000,
+          zIndex: 5,
           background: '#fff',
           border: '1px solid #ddd',
           borderRadius: '50%',
@@ -247,17 +224,6 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
         {/* 현재 위치 마커 */}
         {userLocation && (
           <>
-            <Marker
-              position={userLocation}
-              icon={{
-                path: window.google.maps.SymbolPath.CIRCLE,
-                scale: 12,
-                fillColor: "#4285F4",
-                fillOpacity: 0.8,
-                strokeColor: "#ffffff",
-                strokeWeight: 3,
-              }}
-            />
             <OverlayView
               position={userLocation}
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
@@ -270,46 +236,70 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
           </>
         )}
 
-        {places && places.length > 0 && places.map((place) => (
-          <div key={place.id}>
+        {places && places.length > 0 && places.map((place) => {
+          const isSelected = !!(selectedPlace && place.id === selectedPlace.id);
+          return (
             <OverlayView
+              key={place.id}
               position={place.position}
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '-35px',
-                  transform: 'translate(-50%, -100%)',
-                  whiteSpace: 'nowrap',
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  padding: '4px 12px',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: '#1a1a1a',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-                  pointerEvents: 'none',
-                  backdropFilter: 'blur(4px)',
-                  border: '1px solid rgba(255,255,255,0.8)',
-                  letterSpacing: '-0.01em',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {place.name.length > 10 ? place.name.substring(0, 10) + '...' : place.name}
+              <div onClick={() => handleMarkerClick(place)} style={{ cursor: 'pointer', zIndex: isSelected ? 1000 : 1, position: 'relative' }}>
+                {place.type === 'cafe' ? (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={cafeAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                ) : place.type === 'food' ? (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={foodAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                ) : place.type === 'landmark' ? (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={landmarkAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                ) : place.type === 'drink' ? (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={drinkAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                ) : place.type === 'club' ? (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={clubAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                ) : (
+                  <div style={{ width: 48, height: 48 }}>
+                    <Lottie 
+                      animationData={othersAnimation}
+                      loop={true}
+                      autoplay={true}
+                    />
+                  </div>
+                )}
               </div>
             </OverlayView>
-            <Marker
-              position={place.position}
-              onClick={() => handleMarkerClick(place)}
-              options={{
-                icon: getMarkerIcon(place.type)
-              }}
-            />
-          </div>
-        ))}
+          );
+        })}
 
+        {/* InfoWindow는 map 루프 밖에서 selectedPlace가 있을 때만 렌더링 */}
         {selectedPlace && (
           <InfoWindow
             position={selectedPlace.position}

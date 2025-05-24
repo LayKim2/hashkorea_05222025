@@ -54,7 +54,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           />
           
           {/* 모달 */}
-          <div className="fixed inset-0 z-[10000] overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1001]">
             <div className="flex min-h-full items-center justify-center p-4">
               <motion.div 
                 initial={{ scale: 0.95, opacity: 0 }}

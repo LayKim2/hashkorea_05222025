@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Place } from '../map/MapComponent';
 import { useChatStore } from '../../store/chatStore';
 import { useTranslation } from 'react-i18next';
+import { PlaceType, mapPlaceType } from '../../utils/placeTypes';
 
 // Window 객체에 SpeechRecognition 타입 추가
 declare global {
@@ -267,7 +268,7 @@ const WelcomePopup = ({ onClose, onPlacesFound }: WelcomePopupProps) => {
                 lat: place.geometry?.location?.lat() || 0,
                 lng: place.geometry?.location?.lng() || 0
               },
-              type: place.types?.[0] || 'unknown',
+              type: mapPlaceType(place.types?.[0] || 'unknown'),
               address: place.formatted_address
             }));
 

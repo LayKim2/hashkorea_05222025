@@ -1,8 +1,21 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { PlaceType, mapPlaceType } from '../../utils/placeTypes';
 
 // Gemini API 초기화
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+
+// 언어 감지 함수
+function detectLanguage(text: string): 'ko' | 'ja' | 'zh' | 'en' {
+  // 한글
+  if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(text)) return 'ko';
+  // 일본어
+  if (/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/.test(text)) return 'ja';
+  // 중국어
+  if (/[\u4e00-\u9fff]/.test(text)) return 'zh';
+  // 영어
+  return 'en';
+}
 
 export async function POST(request: Request) {
   try {
@@ -27,8 +40,23 @@ export async function POST(request: Request) {
       preferences: null
     };
 
+    // 사용자 입력 처리
+    const userInput = body.messages[body.messages.length - 1].content;
+    const detectedLang = detectLanguage(userInput);
+    
+    console.log('Original input:', userInput);
+    console.log('Detected language:', detectedLang);
+
     // 시스템 프롬프트와 사용자 메시지 결합
-    const prompt = `You are a travel recommendation AI assistant. Detect the user's language and respond in the same language. Keep track of the information you have collected and what is still needed. When responding, include the current state of information in your response. Current collected information: ${JSON.stringify(currentCollectedInfo)}
+    const prompt = `You are a travel recommendation AI assistant. The user's message is in ${detectedLang} language. Please respond in the same language. Keep track of the information you have collected and what is still needed. When responding, include the current state of information in your response. Current collected information: ${JSON.stringify(currentCollectedInfo)}
+
+When classifying places, use ONLY these types:
+- "cafe": coffee shops, bakeries, dessert cafes
+- "food": restaurants, fast food, any food-related places
+- "drink": bars, pubs, any places primarily serving alcohol
+- "club": night clubs, dance clubs
+- "landmark": tourist spots, attractions, activities, museums, exhibitions
+- "others": any places that don't fit the above categories
 
 {
   "type": "chat" | "recommendation",  // response type
@@ -38,22 +66,26 @@ export async function POST(request: Request) {
     "preferences": string[] | null    // specific preferences (e.g., ["quiet", "historical"])
   },
   "missingInfo": string[],           // list of missing information
-  "message": string,                 // message to show to the user
+  "message": string,                 // message to show to the user (in ${detectedLang})
   "searchTerms": string[] | null,    // place types (only for recommendation type)
-  "requirements": string[] | null    // special requirements (only for recommendation type)
+  "requirements": string[] | null,   // special requirements (only for recommendation type)
+  "placeType": "cafe" | "food" | "drink" | "club" | "landmark" | "others"  // place type classification
 }
 
-Examples in English:
-Input: "I want to visit Seoul"
+Examples in ${detectedLang}:
+Input: "I want to visit a coffee shop in Seoul"
 Output: {
-  "type": "chat",
+  "type": "recommendation",
   "collectedInfo": {
     "location": "Seoul",
-    "purpose": null,
+    "purpose": "coffee shop",
     "preferences": null
   },
-  "missingInfo": ["purpose", "preferences"],
-  "message": "I see you want to visit Seoul! What kind of places are you interested in? For example, tourist spots, restaurants, or shopping areas?"
+  "missingInfo": [],
+  "message": "I'll help you find coffee shops in Seoul.",
+  "searchTerms": ["coffee shop", "cafe"],
+  "requirements": [],
+  "placeType": "cafe"
 }
 
 Input: "I want to see historical sites"
@@ -67,37 +99,11 @@ Output: {
   "missingInfo": [],
   "message": "I'll help you find historical sites in Seoul.",
   "searchTerms": ["historical site", "tourist attraction"],
-  "requirements": ["historical"]
+  "requirements": ["historical"],
+  "placeType": "landmark"
 }
 
-Examples in Korean:
-Input: "서울 가고 싶어"
-Output: {
-  "type": "chat",
-  "collectedInfo": {
-    "location": "서울",
-    "purpose": null,
-    "preferences": null
-  },
-  "missingInfo": ["purpose", "preferences"],
-  "message": "서울을 방문하고 싶으시군요! 어떤 종류의 장소를 찾고 계신가요? 예를 들어, 관광지, 맛집, 쇼핑 장소 등이 있습니다."
-}
-
-Input: "역사적인 장소를 보고 싶어"
-Output: {
-  "type": "recommendation",
-  "collectedInfo": {
-    "location": "서울",
-    "purpose": "역사적 장소",
-    "preferences": ["역사적"]
-  },
-  "missingInfo": [],
-  "message": "서울의 역사적인 장소를 찾아보겠습니다.",
-  "searchTerms": ["역사적 장소", "관광지"],
-  "requirements": ["역사적"]
-}
-
-User input: ${body.messages[body.messages.length - 1].content}`;
+User input: ${userInput}`;
 
     // 메시지 전송 및 응답 받기
     const result = await model.generateContent(prompt);
@@ -137,11 +143,14 @@ User input: ${body.messages[body.messages.length - 1].content}`;
           searchTerms: Array.isArray(parsedContent.searchTerms) ? parsedContent.searchTerms : [parsedContent.searchTerms],
           location: parsedContent.collectedInfo.location,
           requirements: Array.isArray(parsedContent.requirements) ? parsedContent.requirements : [],
-          message: parsedContent.message || 'I will search for places for you.',
-          collectedInfo: parsedContent.collectedInfo
+          message: parsedContent.message,
+          collectedInfo: parsedContent.collectedInfo,
+          placeType: mapPlaceType(parsedContent.placeType || '')
         };
 
         console.log('Final response:', response);
+        console.log('Original Place Type:', parsedContent.placeType);
+        console.log('Mapped Place Type:', response.placeType);
         return NextResponse.json(response);
       }
 
