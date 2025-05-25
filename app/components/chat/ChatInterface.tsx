@@ -438,24 +438,19 @@ const ChatInterface = ({ onClose, onPlacesFound }: ChatInterfaceProps) => {
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-white text-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm rounded-tl-none">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-100" />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-200" />
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Loading Indicator */}
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg text-center">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center relative">
-              <div className="absolute w-full h-full rounded-full bg-red-400 animate-ping opacity-75"></div>
-              <svg className="animate-spin h-8 w-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            </div>
-            <p className="text-gray-800 font-medium">{t('chat.searching')}</p>
-          </div>
-        </div>
-      )}
 
       {/* Speech Recognition Popup */}
       {isListening && (

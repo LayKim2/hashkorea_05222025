@@ -69,6 +69,17 @@ const Header = () => {
       
       // 채팅 메시지 초기화
       clearMessages();
+
+      // Google Maps 스크립트 다시 로드
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+      
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=${langCode}`;
+      script.async = true;
+      document.body.appendChild(script);
       
       // 라우터를 사용하여 페이지 이동
       router.push(newPath);
