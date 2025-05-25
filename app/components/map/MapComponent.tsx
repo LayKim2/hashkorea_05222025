@@ -244,9 +244,30 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
               position={place.position}
               mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
             >
-              <div onClick={() => handleMarkerClick(place)} style={{ cursor: 'pointer', zIndex: isSelected ? 1000 : 1, position: 'relative' }}>
+              <div onClick={() => handleMarkerClick(place)} style={{ 
+                cursor: 'pointer', 
+                zIndex: isSelected ? 1000 : 1, 
+                position: 'relative',
+                transform: isSelected ? 'scale(1.2)' : 'scale(1)',
+                transition: 'transform 0.2s ease-in-out'
+              }}>
+                {/* 장소 이름 레이블 */}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap" style={{ zIndex: 1001 }}>
+                  <div className="bg-white px-2 py-1 rounded-lg shadow-sm border border-gray-100 text-xs font-medium text-gray-700 text-center">
+                    {place.name.replace(/\s/g, '').length > 8 
+                      ? `${place.name.substring(0, place.name.indexOf(' ', 8) > -1 ? place.name.indexOf(' ', 8) : 8)}...` 
+                      : place.name}
+                  </div>
+                  {/* 작은 삼각형 화살표 */}
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 translate-x-[4px] w-2 h-2 bg-white border-r border-b border-gray-100 rotate-45"></div>
+                </div>
                 {place.type === 'cafe' ? (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={cafeAnimation}
                       loop={true}
@@ -254,7 +275,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
                     />
                   </div>
                 ) : place.type === 'food' ? (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={foodAnimation}
                       loop={true}
@@ -262,7 +288,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
                     />
                   </div>
                 ) : place.type === 'landmark' ? (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={landmarkAnimation}
                       loop={true}
@@ -270,7 +301,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
                     />
                   </div>
                 ) : place.type === 'drink' ? (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={drinkAnimation}
                       loop={true}
@@ -278,7 +314,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
                     />
                   </div>
                 ) : place.type === 'club' ? (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={clubAnimation}
                       loop={true}
@@ -286,7 +327,12 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
                     />
                   </div>
                 ) : (
-                  <div style={{ width: 48, height: 48 }}>
+                  <div style={{ 
+                    width: 48, 
+                    height: 48,
+                    filter: isSelected ? 'drop-shadow(0 0 8px rgba(0,0,0,0.2))' : 'none',
+                    animation: isSelected ? 'sparkle 1.5s ease-in-out infinite' : 'none'
+                  }}>
                     <Lottie 
                       animationData={othersAnimation}
                       loop={true}
@@ -298,41 +344,26 @@ const MapComponent = ({ places = [], onSelectPlace }: MapComponentProps) => {
             </OverlayView>
           );
         })}
-
-        {/* InfoWindow는 map 루프 밖에서 selectedPlace가 있을 때만 렌더링 */}
-        {selectedPlace && (
-          <InfoWindow
-            position={selectedPlace.position}
-            onCloseClick={() => setSelectedPlace(null)}
-            options={{
-              pixelOffset: new window.google.maps.Size(0, -32),
-              maxWidth: 280,
-              minWidth: 200,
-              disableAutoPan: false
-            }}
-          >
-            <div className="p-3">
-              <h3 className="font-medium text-gray-900 text-sm">{selectedPlace.name}</h3>
-              <div className="mt-1.5 flex items-center gap-1.5">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                  {selectedPlace.type}
-                </span>
-              </div>
-              {selectedPlace.address && (
-                <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {selectedPlace.address}
-                </p>
-              )}
-            </div>
-          </InfoWindow>
-        )}
       </GoogleMap>
     </div>
   ) : <div className="w-full h-full flex items-center justify-center bg-gray-100">지도 로딩 중...</div>;
 };
+
+// 반짝이는 애니메이션 스타일 추가
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes sparkle {
+    0% {
+      filter: drop-shadow(0 0 8px rgba(0,0,0,0.2));
+    }
+    50% {
+      filter: drop-shadow(0 0 15px rgba(128,0,32,0.9)) drop-shadow(0 0 20px rgba(128,0,32,0.6));
+    }
+    100% {
+      filter: drop-shadow(0 0 8px rgba(0,0,0,0.2));
+    }
+  }
+`;
+document.head.appendChild(style);
 
 export default MapComponent; 
